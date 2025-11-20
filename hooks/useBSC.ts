@@ -43,6 +43,11 @@ export function useIndicators(objectiveId?: string) {
     mutationFn: bscApi.createIndicator,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['indicators'] });
+      alert("Indicador criado com sucesso!");
+    },
+    onError: (error: any) => {
+      console.error("Erro ao criar indicador:", error);
+      alert("Falha ao criar indicador. Tente novamente.");
     }
   });
 
