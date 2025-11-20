@@ -34,6 +34,10 @@ export const StrategicFundamentalsPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fundamentals'] });
       alert("Fundamentos atualizados com sucesso!");
+    },
+    onError: (error: any) => {
+      console.error("Erro ao salvar fundamentos:", error);
+      alert("Falha ao salvar alterações. Tente novamente.");
     }
   });
 
