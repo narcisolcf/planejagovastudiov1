@@ -26,8 +26,12 @@ class MockAuthClient {
   async signInWithPassword({ email, password }: any) {
     await new Promise(resolve => setTimeout(resolve, 800)); // Simula delay de rede
 
-    if (password.length < 6) {
-      return { data: { user: null, session: null }, error: { message: 'Senha muito curta' } };
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return {
+        data: { user: null, session: null },
+        error: { message: 'Senha deve ter no mínimo 8 caracteres, incluindo 1 letra maiúscula e 1 número' }
+      };
     }
 
     const user: User = {
