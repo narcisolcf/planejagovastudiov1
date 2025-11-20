@@ -304,6 +304,30 @@ export const bscApi = {
     };
     MOCK_BSC.indicators.push(newInd);
     return newInd;
+  },
+  createMeasurement: async (measurement: Omit<any, 'id'> & { indicatorId: string }) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const indicator = MOCK_BSC.indicators.find(i => i.id === measurement.indicatorId);
+    if (indicator) {
+      const newMeasurement: any = {
+        id: Math.random().toString(36).substr(2, 9),
+        ...measurement
+      };
+      if (!indicator.measurements) indicator.measurements = [];
+      indicator.measurements.push(newMeasurement);
+      indicator.currentValue = newMeasurement.value;
+      return newMeasurement;
+    }
+    throw new Error("Indicador não encontrado");
+  },
+  createTargets: async (targets: any[], indicatorId: string) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const indicator = MOCK_BSC.indicators.find(i => i.id === indicatorId);
+    if (indicator) {
+      indicator.targets = targets;
+      return targets;
+    }
+    throw new Error("Indicador não encontrado");
   }
 };
 
