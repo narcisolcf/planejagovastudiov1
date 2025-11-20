@@ -76,3 +76,34 @@ export function useStrategicMapData() {
     isLoading: perspectives.isLoading || objectives.isLoading || relationships.isLoading || indicators.isLoading
   };
 }
+
+export function useCreateMeasurement() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bscApi.createMeasurement,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['indicators'] });
+      alert("Medição registrada com sucesso!");
+    },
+    onError: (error: any) => {
+      console.error(error);
+      alert("Erro ao registrar medição.");
+    }
+  });
+}
+
+export function useCreateTargets() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ targets, indicatorId }: { targets: any[], indicatorId: string }) =>
+      bscApi.createTargets(targets, indicatorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['indicators'] });
+      alert("Metas definidas com sucesso!");
+    },
+    onError: (error: any) => {
+      console.error(error);
+      alert("Erro ao salvar metas.");
+    }
+  });
+}
