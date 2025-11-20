@@ -13,7 +13,9 @@ import { ColetaMedicao } from '../../components/bsc/indicators/ColetaMedicao';
 export const IndicatorsPage: React.FC = () => {
   const { data: indicators, isLoading, createIndicator } = useIndicators();
   const { data: objectives } = useObjectives();
-  
+  const createMeasurement = useCreateMeasurement();
+  const createTargets = useCreateTargets();
+
   // UI State
   const [view, setView] = useState<'list' | 'create' | 'details'>('list');
   const [activeTab, setActiveTab] = useState<'cadastro' | 'metas' | 'coleta'>('cadastro');
