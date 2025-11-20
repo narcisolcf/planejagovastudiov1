@@ -160,7 +160,8 @@ export const supabase = supabaseInstance;
 
 // --- MOCK API SERVICE (DADOS DE NEGÓCIO) ---
 // Mantido para persistir dados em memória durante a sessão
-let MOCK_DB: StrategicFundamentals = {
+const savedData = loadMockData();
+let MOCK_DB: StrategicFundamentals = savedData?.db || {
   mission: "Promover a qualidade de vida e o desenvolvimento sustentável do município, através de uma gestão pública eficiente, transparente e participativa.",
   vision: "Ser reconhecida até 2028 como a cidade referência em inovação e bem-estar social no estado.",
   values: ["Transparência", "Ética", "Inovação", "Eficiência", "Sustentabilidade"],
@@ -173,7 +174,7 @@ let MOCK_DB: StrategicFundamentals = {
 };
 
 // --- BSC MOCK DATA ---
-let MOCK_BSC = {
+let MOCK_BSC = savedData?.bsc || {
   perspectives: [
     { id: 'p1', name: 'Financeira', description: 'Sustentabilidade Econômica', type: 'FINANCIAL', color: 'bg-blue-500', order: 1 },
     { id: 'p2', name: 'Cidadãos e Sociedade', description: 'Satisfação do Cidadão', type: 'CUSTOMER', color: 'bg-emerald-500', order: 2 },
@@ -204,7 +205,7 @@ let MOCK_BSC = {
 };
 
 // --- PROJECTS MOCK DATA (PHASE 3) ---
-let MOCK_PROJECTS: Project[] = [
+let MOCK_PROJECTS: Project[] = savedData?.projects || [
   {
     id: 'proj1',
     code: 'PE-2025-01',
