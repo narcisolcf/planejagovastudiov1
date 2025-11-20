@@ -287,6 +287,7 @@ export const fundamentalsApi = {
   update: async (data: Partial<StrategicFundamentals>): Promise<StrategicFundamentals> => {
     await new Promise(resolve => setTimeout(resolve, 600));
     MOCK_DB = { ...MOCK_DB, ...data };
+    saveMockData();
     return { ...MOCK_DB };
   }
 };
@@ -322,6 +323,7 @@ export const bscApi = {
       ...obj
     };
     MOCK_BSC.objectives.push(newObj);
+    saveMockData();
     return newObj;
   },
   createIndicator: async (ind: Omit<Indicator, 'id' | 'code'>) => {
@@ -333,6 +335,7 @@ export const bscApi = {
       ...ind
     };
     MOCK_BSC.indicators.push(newInd);
+    saveMockData();
     return newInd;
   },
   createMeasurement: async (measurement: Omit<any, 'id'> & { indicatorId: string }) => {
@@ -346,6 +349,7 @@ export const bscApi = {
       if (!indicator.measurements) indicator.measurements = [];
       indicator.measurements.push(newMeasurement);
       indicator.currentValue = newMeasurement.value;
+      saveMockData();
       return newMeasurement;
     }
     throw new Error("Indicador não encontrado");
@@ -355,6 +359,7 @@ export const bscApi = {
     const indicator = MOCK_BSC.indicators.find(i => i.id === indicatorId);
     if (indicator) {
       indicator.targets = targets;
+      saveMockData();
       return targets;
     }
     throw new Error("Indicador não encontrado");
@@ -381,6 +386,7 @@ export const projectsApi = {
       ...project
     } as Project;
     MOCK_PROJECTS.push(newProject);
+    saveMockData();
     return newProject;
   }
 };
