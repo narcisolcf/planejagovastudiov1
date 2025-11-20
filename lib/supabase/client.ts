@@ -13,6 +13,31 @@ const isMockMode = !envUrl || envUrl === 'your_supabase_url' || envUrl.includes(
 const supabaseUrl = envUrl || 'https://xyz.supabase.co';
 const supabaseAnonKey = envKey || 'public-anon-key';
 
+// Funções para persistência em localStorage
+const loadMockData = () => {
+  try {
+    const stored = localStorage.getItem('sgem_mock_data');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.warn('Erro ao carregar dados mockados:', e);
+  }
+  return null;
+};
+
+const saveMockData = () => {
+  try {
+    localStorage.setItem('sgem_mock_data', JSON.stringify({
+      bsc: MOCK_BSC,
+      projects: MOCK_PROJECTS,
+      db: MOCK_DB
+    }));
+  } catch (e) {
+    console.warn('Erro ao salvar dados mockados:', e);
+  }
+};
+
 // --- MOCK AUTH CLIENT ---
 // Implementação simulada do Supabase Auth para permitir testar o frontend sem backend configurado
 class MockAuthClient {
