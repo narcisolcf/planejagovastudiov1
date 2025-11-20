@@ -20,6 +20,11 @@ export function useObjectives() {
     mutationFn: bscApi.createObjective,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['objectives'] });
+      alert("Objetivo criado com sucesso!");
+    },
+    onError: (error: any) => {
+      console.error("Erro ao criar objetivo:", error);
+      alert("Falha ao criar objetivo. Verifique os dados e tente novamente.");
     }
   });
 
