@@ -166,18 +166,37 @@ export const IndicatorsPage: React.FC = () => {
 
           {activeTab === 'coleta' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ColetaMedicao onCollect={(m) => alert('Medição registrada! (Simulação)')} />
+              <ColetaMedicao onCollect={(m) => {
+                createMeasurement.mutate({
+                  ...m,
+                  indicatorId: selectedIndicator.id,
+                  status: 'on_target'
+                } as any);
+              }} />
               <Card>
                 <CardHeader><CardTitle>Histórico Recente</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="text-center text-slate-400 py-8 text-sm">Nenhuma medição anterior registrada.</div>
+                  {selectedIndicator.measurements?.length ? (
+                    <ul className="space-y-2">
+                      {selectedIndicator.measurements.map(m => (
+                        <li key={m.id} className="flex justify-between text-sm border-b pb-2">
+                          <span>{new Date(m.date).toLocaleDateString()}</span>
+                          <span className="font-bold">{m.value} {selectedIndicator.unit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center text-slate-400 py-8 text-sm">Nenhuma medição anterior registrada.</div>
+                  )}
                 </CardContent>
               </Card>
             </div>
           )}
-
           {activeTab === 'metas' && (
-            <MetasIndicador baseline={selectedIndicator.baseline} onSave={(t) => alert(`${t.length} metas geradas com sucesso!`)} />
+            <MetasIndicador
+              baseline={selectedIndicator.baseline}
+              onSave={(t) => createTargets.mutate({ targets: t, indicatorId: selectedIndicator.id })}
+            />
           )}
         </div>
       )}
