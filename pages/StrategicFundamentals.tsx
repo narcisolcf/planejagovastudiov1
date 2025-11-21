@@ -6,14 +6,15 @@ import { Button } from '../components/ui/Button';
 import { Input, Textarea, Label } from '../components/ui/Input';
 import { fundamentalsApi } from '../lib/supabase/client';
 import { StrategicFundamentals, SwotType, SwotItem } from '../types';
-import { 
+import { usePrompt } from '../hooks/usePrompt';
+import {
   Save, Plus, Trash2, Loader2, AlertTriangle, TrendingUp, ShieldAlert, Zap,
   Users, DollarSign, TrendingDown, Scale, FileText, Building, Globe, Lock, Target, Briefcase, Lightbulb, CheckCircle
 } from 'lucide-react';
 
 // Mapeamento de ícones disponíveis para seleção
 const ICON_MAP: Record<string, any> = {
-  Users, DollarSign, TrendingUp, TrendingDown, Scale, FileText, 
+  Users, DollarSign, TrendingUp, TrendingDown, Scale, FileText,
   Building, Globe, Lock, Target, Briefcase, Lightbulb, CheckCircle,
   AlertTriangle, ShieldAlert, Zap
 };
@@ -34,6 +35,10 @@ export const StrategicFundamentalsPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fundamentals'] });
       alert("Fundamentos atualizados com sucesso!");
+    },
+    onError: (error: any) => {
+      console.error("Erro ao salvar fundamentos:", error);
+      alert("Falha ao salvar alterações. Tente novamente.");
     }
   });
 
@@ -60,8 +65,8 @@ export const StrategicFundamentalsPage: React.FC = () => {
             onClick={() => setActiveTab('identity')}
             className={`
               whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-              ${activeTab === 'identity' 
-                ? 'border-blue-500 text-blue-600' 
+              ${activeTab === 'identity'
+                ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}
             `}
           >
@@ -71,8 +76,8 @@ export const StrategicFundamentalsPage: React.FC = () => {
             onClick={() => setActiveTab('swot')}
             className={`
               whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-              ${activeTab === 'swot' 
-                ? 'border-blue-500 text-blue-600' 
+              ${activeTab === 'swot'
+                ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}
             `}
           >
@@ -92,15 +97,17 @@ export const StrategicFundamentalsPage: React.FC = () => {
 
 // --- Subcomponents for Better Organization ---
 
-const IdentityForm: React.FC<{ 
-  initialData: StrategicFundamentals; 
+const IdentityForm: React.FC<{
+  initialData: StrategicFundamentals;
   onSave: (data: any) => void;
   isSaving: boolean;
 }> = ({ initialData, onSave, isSaving }) => {
-  const { register, control, handleSubmit } = useForm<StrategicFundamentals>({
+  const { register, control, handleSubmit, formState: { isDirty } } = useForm<StrategicFundamentals>({
     defaultValues: initialData
   });
-  
+
+  usePrompt('Você tem alterações não salvas. Deseja realmente sair?', isDirty);
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "values" as any // Type casting for simplicity in this prototype
@@ -115,22 +122,22 @@ const IdentityForm: React.FC<{
         <CardContent className="space-y-6">
           <div>
             <Label htmlFor="mission">Missão</Label>
-            <Textarea 
-              id="mission" 
-              rows={3} 
+            <Textarea
+              id="mission"
+              rows={3}
               placeholder="Qual a razão de existir da prefeitura?"
-              {...register("mission")} 
+              {...register("mission")}
             />
             <p className="text-xs text-slate-500 mt-1">Ex: Servir ao cidadão com excelência...</p>
           </div>
-          
+
           <div>
             <Label htmlFor="vision">Visão de Futuro (2028)</Label>
-            <Textarea 
-              id="vision" 
+            <Textarea
+              id="vision"
               rows={3}
               placeholder="Onde queremos chegar ao fim do mandato?"
-              {...register("vision")} 
+              {...register("vision")}
             />
           </div>
         </CardContent>
@@ -148,10 +155,10 @@ const IdentityForm: React.FC<{
             {fields.map((field, index) => (
               <div key={field.id} className="flex gap-2">
                 <Input {...register(`values.${index}` as any)} />
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   className="text-red-500 hover:text-red-700"
                   onClick={() => remove(index)}
                 >
@@ -233,11 +240,13 @@ const SwotManager: React.FC<{
   onSave: (data: any) => void;
   isSaving: boolean;
 }> = ({ initialData, onSave, isSaving }) => {
-  const { control, register, handleSubmit } = useForm<{ swotAnalysis: SwotItem[] }>({
+  const { control, register, handleSubmit, formState: { isDirty } } = useForm<{ swotAnalysis: SwotItem[] }>({
     defaultValues: {
       swotAnalysis: initialData.swotAnalysis
     }
   });
+
+  usePrompt('Você tem alterações não salvas na análise SWOT. Deseja realmente sair?', isDirty);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -283,8 +292,8 @@ const SwotManager: React.FC<{
                 control={control}
                 name={`swotAnalysis.${index}.icon`}
                 render={({ field: { onChange, value } }) => (
-                  <IconPicker 
-                    currentIconName={value} 
+                  <IconPicker
+                    currentIconName={value}
                     onSelect={onChange}
                     colorClass={colorClass}
                   />
@@ -292,25 +301,25 @@ const SwotManager: React.FC<{
               />
 
               {/* Text Input */}
-              <Input 
+              <Input
                 {...register(`swotAnalysis.${index}.text`)}
                 className="flex-1 h-8 text-sm"
                 placeholder="Descrição..."
               />
-              
+
               {/* Importance Input */}
               <div className="flex flex-col items-center" title="Importância (1-5)">
-                <Input 
-                  type="number" 
-                  min={1} 
-                  max={5} 
+                <Input
+                  type="number"
+                  min={1}
+                  max={5}
                   {...register(`swotAnalysis.${index}.importance`, { valueAsNumber: true, min: 1, max: 5 })}
                   className="w-14 h-8 text-sm text-center px-1"
                 />
               </div>
-              
+
               {/* Delete Action */}
-              <button 
+              <button
                 type="button"
                 onClick={() => remove(index)}
                 className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-2"
@@ -320,11 +329,11 @@ const SwotManager: React.FC<{
             </div>
           );
         })}
-        
-        <Button 
+
+        <Button
           type="button"
-          variant="ghost" 
-          size="sm" 
+          variant="ghost"
+          size="sm"
           className="w-full text-slate-500 border-dashed border border-slate-300 mt-2"
           onClick={() => handleAddItem(type)}
         >
@@ -342,7 +351,7 @@ const SwotManager: React.FC<{
         <SwotSection type={SwotType.OPPORTUNITY} title="Oportunidades (Externo)" icon={TrendingUp} colorClass="bg-blue-500" />
         <SwotSection type={SwotType.THREAT} title="Ameaças (Externo)" icon={ShieldAlert} colorClass="bg-red-500" />
       </div>
-      
+
       <div className="flex justify-end bg-white p-4 rounded-xl border border-slate-200 shadow-sm sticky bottom-4">
         <Button type="submit" isLoading={isSaving}>
           <Save size={16} className="mr-2" />

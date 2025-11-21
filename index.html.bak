@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://fav.farm/🏛️" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="description" content="SGEM - Sistema de Gestão Estratégica Municipal" />
+    
+    <title>SGEM | Gestão Estratégica</title>
+    
+    <!-- Tailwind CSS (v3.4 via CDN for immediate prototyping without build step config) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              border: "hsl(var(--border))",
+              input: "hsl(var(--input))",
+              ring: "hsl(var(--ring))",
+              background: "hsl(var(--background))",
+              foreground: "hsl(var(--foreground))",
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- React Flow CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reactflow@11.10.4/dist/style.css" />
+
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      /* React Flow Customizations */
+      .react-flow__node {
+        border: none;
+        border-radius: 8px;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.83.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-hook-form": "https://aistudiocdn.com/react-hook-form@^7.66.1",
+    "@tanstack/react-query": "https://aistudiocdn.com/@tanstack/react-query@^5.90.10",
+    "reactflow": "https://esm.sh/reactflow@11.10.4?external=react,react-dom",
+    "dagre": "https://esm.sh/dagre@0.8.5",
+    "recharts": "https://esm.sh/recharts@2.12.2?external=react,react-dom",
+    "lodash": "https://esm.sh/lodash@4.17.21"
+  }
+}
+</script>
+</head>
+  <body>
+    <noscript>Você precisa habilitar JavaScript para executar este app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
