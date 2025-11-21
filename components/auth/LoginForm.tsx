@@ -14,7 +14,7 @@ interface LoginFormData {
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  
+
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
@@ -25,15 +25,15 @@ export function LoginForm() {
         email: data.email,
         password: data.password
       });
-      
+
       if (error) throw error;
-      
+
       // O redirecionamento ocorre automaticamente pelo AuthContext
     } catch (error: any) {
       console.error('Erro no login:', error);
       // Tratamento amigável para erro de fetch (caso o mock falhe ou configuração misturada)
-      const msg = error.message === 'Failed to fetch' 
-        ? 'Erro de conexão. Verifique sua internet ou a configuração do Supabase.' 
+      const msg = error.message === 'Failed to fetch'
+        ? 'Erro de conexão. Verifique sua internet ou a configuração do Supabase.'
         : (error.message || 'Falha ao realizar login.');
       setAuthError(msg);
     } finally {
@@ -58,12 +58,12 @@ export function LoginForm() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div className="space-y-2">
             <Label htmlFor="email">E-mail Institucional</Label>
             <Input
               id="email"
-              {...register('email', { 
+              {...register('email', {
                 required: 'E-mail é obrigatório',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -79,12 +79,12 @@ export function LoginForm() {
               <p className="text-sm text-red-600">{errors.email.message}</p>
             )}
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="password">Senha</Label>
             <Input
               id="password"
-              {...register('password', { 
+              {...register('password', {
                 required: 'Senha é obrigatória',
                 minLength: { value: 6, message: 'Mínimo de 6 caracteres' }
               })}
@@ -103,12 +103,12 @@ export function LoginForm() {
               <span className="font-bold">Erro:</span> {authError}
             </div>
           )}
-          
+
           <Button type="submit" className="w-full h-11 text-base" isLoading={loading}>
             {loading ? 'Autenticando...' : 'Entrar no Sistema'}
           </Button>
         </form>
-        
+
         <div className="mt-6 text-center">
           <p className="text-xs text-slate-400">
             Sistema seguro e compatível com LGPD.
