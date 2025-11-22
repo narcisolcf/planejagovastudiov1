@@ -1,0 +1,53 @@
+{
+  "project": {
+    "name": "PlanejaGov v1",
+    "version": "1.0.0",
+    "repository": "https://github.com/narcisolcf/planejagovastudiov1"
+  },
+  "backend": {
+    "baseUrl": "https://SEU_DOMINIO.vercel.app/api",
+    "endpoints": {
+      "planos": {
+        "list": "/planos",
+        "create": "/planos",
+        "get": "/planos/:id",
+        "update": "/planos/:id",
+        "delete": "/planos/:id"
+      },
+      "auth": {
+        "login": "/auth/login",
+        "logout": "/auth/logout",
+        "profile": "/auth/profile"
+      }
+    },
+    "testData": {
+      "plano": {
+        "nome": "Plano de Teste",
+        "descricao": "Este é um plano criado para testes automatizados"
+      }
+    }
+  },
+  "frontend": {
+    "baseUrl": "https://SEU_DOMINIO.vercel.app",
+    "pages": {
+      "home": "/",
+      "login": "/login",
+      "planos": "/planos",
+      "dashboard": "/dashboard"
+    },
+    "testUser": {
+      "email": "teste@exemplo.com",
+      "senha": "SenhaSegura123!",
+      "nome": "Usuário Teste"
+    }
+  },
+  "test": {
+    "timeout": 30000,
+    "retries": 2,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "breakpoints": [375, 768, 1024, 1280]
+  }
+}
