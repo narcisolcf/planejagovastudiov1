@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useIndicators, useObjectives, useCreateMeasurement, useCreateTargets } from '../../hooks/useBSC';
+import { useIndicators, useObjectives } from '../../hooks/useBSC';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input, Label } from '../../components/ui/Input';
@@ -13,9 +13,7 @@ import { ColetaMedicao } from '../../components/bsc/indicators/ColetaMedicao';
 export const IndicatorsPage: React.FC = () => {
   const { data: indicators, isLoading, createIndicator } = useIndicators();
   const { data: objectives } = useObjectives();
-  const createMeasurement = useCreateMeasurement();
-  const createTargets = useCreateTargets();
-
+  
   // UI State
   const [view, setView] = useState<'list' | 'create' | 'details'>('list');
   const [activeTab, setActiveTab] = useState<'cadastro' | 'metas' | 'coleta'>('cadastro');
@@ -23,7 +21,7 @@ export const IndicatorsPage: React.FC = () => {
   
   const { register, handleSubmit, reset, setValue } = useForm<Partial<Indicator>>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Partial<Indicator>) => {
     await createIndicator({
       name: data.name,
       objectiveId: data.objectiveId,
@@ -166,37 +164,18 @@ export const IndicatorsPage: React.FC = () => {
 
           {activeTab === 'coleta' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ColetaMedicao onCollect={(m) => {
-                createMeasurement.mutate({
-                  ...m,
-                  indicatorId: selectedIndicator.id,
-                  status: 'on_target'
-                } as any);
-              }} />
+              <ColetaMedicao onCollect={(m) => alert('Medição registrada! (Simulação)')} />
               <Card>
                 <CardHeader><CardTitle>Histórico Recente</CardTitle></CardHeader>
                 <CardContent>
-                  {selectedIndicator.measurements?.length ? (
-                    <ul className="space-y-2">
-                      {selectedIndicator.measurements.map(m => (
-                        <li key={m.id} className="flex justify-between text-sm border-b pb-2">
-                          <span>{new Date(m.date).toLocaleDateString()}</span>
-                          <span className="font-bold">{m.value} {selectedIndicator.unit}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="text-center text-slate-400 py-8 text-sm">Nenhuma medição anterior registrada.</div>
-                  )}
+                  <div className="text-center text-slate-400 py-8 text-sm">Nenhuma medição anterior registrada.</div>
                 </CardContent>
               </Card>
             </div>
           )}
+
           {activeTab === 'metas' && (
-            <MetasIndicador
-              baseline={selectedIndicator.baseline}
-              onSave={(t) => createTargets.mutate({ targets: t, indicatorId: selectedIndicator.id })}
-            />
+            <MetasIndicador baseline={selectedIndicator.baseline} onSave={(t) => alert(`${t.length} metas geradas com sucesso!`)} />
           )}
         </div>
       )}

@@ -25,9 +25,15 @@ export const ProjectsDashboardPage: React.FC = () => {
   const criticalProjects = projects.filter(p => p.health === 'CRITICAL').length;
   const totalBudget = projects.reduce((acc, p) => acc + p.budget.approved, 0);
   const totalSpent = projects.reduce((acc, p) => acc + p.budget.spent, 0);
+  const executionRate = totalBudget > 0 ? (totalSpent / totalBudget * 100).toFixed(1) : '0.0';
   const avgCPI = projects.length ? (projects.reduce((acc, p) => acc + (p.cpi || 1), 0) / projects.length).toFixed(2) : '0.00';
 
-  if (isLoading) return <div className="p-8 text-center">Carregando projetos...</div>;
+  if (isLoading) return (
+    <div className="p-8 flex flex-col items-center justify-center gap-4 min-h-[400px]">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      <p className="text-slate-600 font-medium">Carregando projetos...</p>
+    </div>
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -64,7 +70,7 @@ export const ProjectsDashboardPage: React.FC = () => {
           <CardContent className="p-6 flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-500">Execução Orçamentária</p>
-              <h3 className="text-2xl font-bold text-slate-900">{(totalSpent/totalBudget * 100).toFixed(1)}%</h3>
+              <h3 className="text-2xl font-bold text-slate-900">{executionRate}%</h3>
               <p className="text-xs text-slate-400">R$ {(totalSpent/1000).toFixed(0)}k / {(totalBudget/1000).toFixed(0)}k</p>
             </div>
             <div className="p-3 bg-emerald-100 text-emerald-600 rounded-full">

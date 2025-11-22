@@ -1,7 +1,7 @@
 import React from 'react';
 import { Panel } from 'reactflow';
 import { Button } from '../../ui/Button';
-import { Save, Layout, Download, ZoomIn, ZoomOut,Maximize } from 'lucide-react';
+import { Save, Layout, Download } from 'lucide-react';
 
 interface MapToolbarProps {
   onLayout: () => void;

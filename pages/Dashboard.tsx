@@ -264,12 +264,7 @@ export const DashboardPage: React.FC = () => {
                     <Upload size={14} className="mr-2" />
                     {uploadingType === 'PPA' ? 'Enviando...' : 'Upload da Lei (PDF)'}
                   </Button>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => alert('Funcionalidade em desenvolvimento. Em breve você poderá detalhar os programas do PPA.')}
-                  >
+                  <Button variant="primary" size="sm" className="w-full">
                     Detalhar Programas
                   </Button>
                 </div>
@@ -322,12 +317,7 @@ export const DashboardPage: React.FC = () => {
                     <Upload size={14} className="mr-2" />
                     {uploadingType === 'LDO' ? 'Enviando...' : 'Upload da Lei (PDF)'}
                   </Button>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => alert('Funcionalidade em desenvolvimento. Em breve você poderá visualizar as metas fiscais da LDO.')}
-                  >
+                  <Button variant="primary" size="sm" className="w-full">
                     Ver Metas Fiscais
                   </Button>
                 </div>
@@ -377,12 +367,7 @@ export const DashboardPage: React.FC = () => {
                     <Upload size={14} className="mr-2" />
                     {uploadingType === 'LOA' ? 'Enviando...' : 'Upload da Lei (PDF)'}
                   </Button>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => alert('Funcionalidade em desenvolvimento. Em breve você poderá acompanhar a execução orçamentária em tempo real.')}
-                  >
+                  <Button variant="primary" size="sm" className="w-full">
                     Acompanhar Execução
                   </Button>
                 </div>
