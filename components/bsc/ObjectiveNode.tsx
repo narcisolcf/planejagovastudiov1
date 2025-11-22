@@ -15,19 +15,19 @@ export const ObjectiveNode = memo(({ data }: { data: ObjectiveNodeData }) => {
     <div className={`w-64 rounded-lg shadow-lg overflow-hidden border border-slate-200 bg-white`}>
       {/* Header colored by perspective */}
       <div className={`h-2 ${data.colorClass}`} />
-      
+
       <div className="p-3">
         <Handle type="target" position={Position.Top} className="!bg-slate-400" />
-        
+
         <div className="flex justify-between items-center mb-1">
           <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600`}>
             {data.code}
           </span>
           <div className="flex items-center gap-1" title="Progresso">
             <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div 
+              <div
                 className={`h-full ${data.progress >= 70 ? 'bg-emerald-500' : data.progress >= 40 ? 'bg-amber-500' : 'bg-red-500'}`}
-                style={{ width: `${data.progress}%` }} 
+                style={{ width: `${data.progress}%` }}
               />
             </div>
             <span className="text-[10px] text-slate-500">{data.progress}%</span>
@@ -52,3 +52,5 @@ export const ObjectiveNode = memo(({ data }: { data: ObjectiveNodeData }) => {
     </div>
   );
 });
+
+ObjectiveNode.displayName = 'ObjectiveNode';

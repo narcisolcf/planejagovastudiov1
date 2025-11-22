@@ -103,13 +103,14 @@ export const StrategicMapPage: React.FC = () => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, objectives.data, relationships.data, perspectives.data, indicators.data]);
 
   const onLayout = useCallback(() => {
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges);
     setNodes([...layoutedNodes]);
     setEdges([...layoutedEdges]);
-  }, [nodes, edges]);
+  }, [nodes, edges, setNodes, setEdges]);
 
   const onSave = useCallback(async () => {
     setIsSaving(true);
@@ -117,7 +118,7 @@ export const StrategicMapPage: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     setIsSaving(false);
     alert('Mapa Estratégico salvo com sucesso!');
-  }, [nodes, edges]);
+  }, []);
 
   if (isLoading) {
     return <div className="h-96 flex items-center justify-center"><Loader2 className="animate-spin" /></div>;

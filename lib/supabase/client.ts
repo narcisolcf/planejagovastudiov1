@@ -1,42 +1,18 @@
 
 import { createClient, SupabaseClient, Session, User } from '@supabase/supabase-js';
 import { StrategicFundamentals, SwotType, Perspective, StrategicObjective, ObjectiveRelationship, Indicator, Project } from '../../types';
+import { validatePassword } from '../validation';
 
 // --- CONFIGURAÇÃO ---
 // Usando import.meta.env para Vite.
-const envUrl = (import.meta as any).env?.VITE_SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL;
-const envKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
+const envUrl = (import.meta.env?.VITE_SUPABASE_URL as string | undefined) || process.env.REACT_APP_SUPABASE_URL;
+const envKey = (import.meta.env?.VITE_SUPABASE_ANON_KEY as string | undefined) || process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 // Verifica se estamos usando valores reais ou placeholders
 const isMockMode = !envUrl || envUrl === 'your_supabase_url' || envUrl.includes('xyz.supabase.co');
 
 const supabaseUrl = envUrl || 'https://xyz.supabase.co';
 const supabaseAnonKey = envKey || 'public-anon-key';
-
-// Funções para persistência em localStorage
-const loadMockData = () => {
-  try {
-    const stored = localStorage.getItem('sgem_mock_data');
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (e) {
-    console.warn('Erro ao carregar dados mockados:', e);
-  }
-  return null;
-};
-
-const saveMockData = () => {
-  try {
-    localStorage.setItem('sgem_mock_data', JSON.stringify({
-      bsc: MOCK_BSC,
-      projects: MOCK_PROJECTS,
-      db: MOCK_DB
-    }));
-  } catch (e) {
-    console.warn('Erro ao salvar dados mockados:', e);
-  }
-};
 
 // --- MOCK AUTH CLIENT ---
 // Implementação simulada do Supabase Auth para permitir testar o frontend sem backend configurado
@@ -48,14 +24,15 @@ class MockAuthClient {
     return stored ? JSON.parse(stored) : null;
   }
 
-  async signInWithPassword({ email, password }: any) {
+  async signInWithPassword({ email, password }: { email: string; password: string }) {
     await new Promise(resolve => setTimeout(resolve, 800)); // Simula delay de rede
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-    if (!passwordRegex.test(password)) {
+    // Validate password strength (in mock mode, accept any password for development)
+    const validation = validatePassword(password);
+    if (!validation.valid && process.env.NODE_ENV === 'production') {
       return {
         data: { user: null, session: null },
-        error: { message: 'Senha deve ter no mínimo 8 caracteres, incluindo 1 letra maiúscula e 1 número' }
+        error: { message: validation.errors.join('. ') }
       };
     }
 
@@ -99,7 +76,7 @@ class MockAuthClient {
   }
 
   // Sistema simples de pub/sub para onAuthStateChange
-  private subscribers: Function[] = [];
+  private subscribers: Array<(event: string, session: Session | null) => void> = [];
 
   onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     this.subscribers.push(callback);
@@ -124,10 +101,20 @@ class MockAuthClient {
 }
 
 // --- SUPABASE CLIENT FACTORY ---
-let supabaseInstance: any;
+interface MockSupabaseClient {
+  auth: MockAuthClient;
+  from: (table: string) => any;
+  storage: any;
+}
+
+let supabaseInstance: SupabaseClient | MockSupabaseClient;
+
+const isDevelopment = import.meta.env?.DEV ?? true;
 
 if (isMockMode) {
-  console.warn('⚠️ SGEM: Executando em MODO MOCK (Sem conexão real com Supabase).');
+  if (isDevelopment) {
+    console.warn('⚠️ SGEM: Executando em MODO MOCK (Sem conexão real com Supabase).');
+  }
   const mockAuth = new MockAuthClient();
   supabaseInstance = {
     auth: mockAuth,
@@ -159,9 +146,34 @@ if (isMockMode) {
 export const supabase = supabaseInstance;
 
 // --- MOCK API SERVICE (DADOS DE NEGÓCIO) ---
-// Mantido para persistir dados em memória durante a sessão
-const savedData = loadMockData();
-let MOCK_DB: StrategicFundamentals = savedData?.db || {
+// Persistência com localStorage
+const STORAGE_KEYS = {
+  FUNDAMENTALS: 'sgem-mock-fundamentals',
+  BSC: 'sgem-mock-bsc',
+  PROJECTS: 'sgem-mock-projects'
+};
+
+// Helper para carregar dados do localStorage
+const loadFromStorage = <T>(key: string, defaultValue: T): T => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch (error) {
+    console.warn(`Failed to load ${key} from storage:`, error);
+    return defaultValue;
+  }
+};
+
+// Helper para salvar dados no localStorage
+const saveToStorage = (key: string, data: any): void => {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.warn(`Failed to save ${key} to storage:`, error);
+  }
+};
+
+const DEFAULT_FUNDAMENTALS: StrategicFundamentals = {
   mission: "Promover a qualidade de vida e o desenvolvimento sustentável do município, através de uma gestão pública eficiente, transparente e participativa.",
   vision: "Ser reconhecida até 2028 como a cidade referência em inovação e bem-estar social no estado.",
   values: ["Transparência", "Ética", "Inovação", "Eficiência", "Sustentabilidade"],
@@ -173,8 +185,10 @@ let MOCK_DB: StrategicFundamentals = savedData?.db || {
   ]
 };
 
+let MOCK_DB: StrategicFundamentals = loadFromStorage(STORAGE_KEYS.FUNDAMENTALS, DEFAULT_FUNDAMENTALS);
+
 // --- BSC MOCK DATA ---
-let MOCK_BSC = savedData?.bsc || {
+let MOCK_BSC = {
   perspectives: [
     { id: 'p1', name: 'Financeira', description: 'Sustentabilidade Econômica', type: 'FINANCIAL', color: 'bg-blue-500', order: 1 },
     { id: 'p2', name: 'Cidadãos e Sociedade', description: 'Satisfação do Cidadão', type: 'CUSTOMER', color: 'bg-emerald-500', order: 2 },
@@ -205,7 +219,7 @@ let MOCK_BSC = savedData?.bsc || {
 };
 
 // --- PROJECTS MOCK DATA (PHASE 3) ---
-let MOCK_PROJECTS: Project[] = savedData?.projects || [
+let MOCK_PROJECTS: Project[] = [
   {
     id: 'proj1',
     code: 'PE-2025-01',
@@ -287,7 +301,7 @@ export const fundamentalsApi = {
   update: async (data: Partial<StrategicFundamentals>): Promise<StrategicFundamentals> => {
     await new Promise(resolve => setTimeout(resolve, 600));
     MOCK_DB = { ...MOCK_DB, ...data };
-    saveMockData();
+    saveToStorage(STORAGE_KEYS.FUNDAMENTALS, MOCK_DB);
     return { ...MOCK_DB };
   }
 };
@@ -323,7 +337,7 @@ export const bscApi = {
       ...obj
     };
     MOCK_BSC.objectives.push(newObj);
-    saveMockData();
+    saveToStorage(STORAGE_KEYS.BSC, MOCK_BSC);
     return newObj;
   },
   createIndicator: async (ind: Omit<Indicator, 'id' | 'code'>) => {
@@ -335,34 +349,8 @@ export const bscApi = {
       ...ind
     };
     MOCK_BSC.indicators.push(newInd);
-    saveMockData();
+    saveToStorage(STORAGE_KEYS.BSC, MOCK_BSC);
     return newInd;
-  },
-  createMeasurement: async (measurement: Omit<any, 'id'> & { indicatorId: string }) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const indicator = MOCK_BSC.indicators.find(i => i.id === measurement.indicatorId);
-    if (indicator) {
-      const newMeasurement: any = {
-        id: Math.random().toString(36).substr(2, 9),
-        ...measurement
-      };
-      if (!indicator.measurements) indicator.measurements = [];
-      indicator.measurements.push(newMeasurement);
-      indicator.currentValue = newMeasurement.value;
-      saveMockData();
-      return newMeasurement;
-    }
-    throw new Error("Indicador não encontrado");
-  },
-  createTargets: async (targets: any[], indicatorId: string) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const indicator = MOCK_BSC.indicators.find(i => i.id === indicatorId);
-    if (indicator) {
-      indicator.targets = targets;
-      saveMockData();
-      return targets;
-    }
-    throw new Error("Indicador não encontrado");
   }
 };
 
@@ -386,7 +374,6 @@ export const projectsApi = {
       ...project
     } as Project;
     MOCK_PROJECTS.push(newProject);
-    saveMockData();
     return newProject;
   }
 };

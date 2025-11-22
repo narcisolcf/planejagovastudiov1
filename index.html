@@ -1,50 +1,48 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="https://fav.farm/🏛️" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#2563eb" />
-  <meta name="description" content="SGEM - Sistema de Gestão Estratégica Municipal" />
-
-  <title>SGEM | Gestão Estratégica</title>
-
-  <!-- Tailwind CSS (v3.4 via CDN for immediate prototyping without build step config) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            border: "hsl(var(--border))",
-            input: "hsl(var(--input))",
-            ring: "hsl(var(--ring))",
-            background: "hsl(var(--background))",
-            foreground: "hsl(var(--foreground))",
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://fav.farm/🏛️" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="description" content="SGEM - Sistema de Gestão Estratégica Municipal" />
+    
+    <title>SGEM | Gestão Estratégica</title>
+    
+    <!-- Tailwind CSS (v3.4 via CDN for immediate prototyping without build step config) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              border: "hsl(var(--border))",
+              input: "hsl(var(--input))",
+              ring: "hsl(var(--ring))",
+              background: "hsl(var(--background))",
+              foreground: "hsl(var(--foreground))",
+            }
           }
         }
       }
-    }
-  </script>
+    </script>
+    
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- React Flow CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reactflow@11.10.4/dist/style.css" />
 
-  <!-- Font Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- React Flow CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reactflow@11.10.4/dist/style.css" />
-
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-
-    /* React Flow Customizations */
-    .react-flow__node {
-      border: none;
-      border-radius: 8px;
-    }
-  </style>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      /* React Flow Customizations */
+      .react-flow__node {
+        border: none;
+        border-radius: 8px;
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
@@ -64,12 +62,11 @@
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
-
-<body>
-  <noscript>Você precisa habilitar JavaScript para executar este app.</noscript>
-  <div id="root"></div>
-  <script type="module" src="/main.tsx"></script>
+  <body>
+    <noscript>Você precisa habilitar JavaScript para executar este app.</noscript>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
 </body>
-
 </html>

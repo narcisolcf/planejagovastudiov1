@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Target, 
-  FileText, 
-  Briefcase, 
-  Menu, 
-  X, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Target,
+  FileText,
+  Briefcase,
+  Menu,
+  X,
+  LogOut,
   Building2,
   GitCompare
 } from 'lucide-react';
 import { Button } from './ui/Button';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,11 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   const navigation: { name: string; href: string; icon: React.ElementType; phase: string; locked?: boolean }[] = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard, phase: 'Todos' },
@@ -98,7 +104,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <p className="text-xs text-slate-500 truncate">Pref. Municipal</p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" className="w-full justify-start text-red-400 hover:bg-red-900/20 hover:text-red-300">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-red-400 hover:bg-red-900/20 hover:text-red-300"
+              onClick={handleLogout}
+            >
               <LogOut size={16} className="mr-2" />
               Sair
             </Button>
