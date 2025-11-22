@@ -1,295 +1,147 @@
-# SGEM - Sistema de Gestão Estratégica Municipal
+# PlanejaGov - Sistema de Planejamento Governamental
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-3178C6?logo=typescript)
-![License](https://img.shields.io/badge/license-MIT-green)
+Sistema desenvolvido para auxiliar municípios brasileiros na gestão e planejamento de ações governamentais.
 
-Plataforma integrada para gestão estratégica de municípios brasileiros baseada na metodologia BSC (Balanced Scorecard).
+## 📋 Pré-requisitos
 
-## 📋 Sumário
+- Node.js 18.x ou superior
+- npm 9.x ou yarn 1.22.x
+- Conta no [Supabase](https://supabase.com) (opcional, para banco de dados)
+- Chave da API do [Google Gemini](https://ai.google.dev/)
 
-- [Características](#características)
-- [Pré-requisitos](#pré-requisitos)
-- [Instalação](#instalação)
-- [Configuração](#configuração)
-- [Executando o Projeto](#executando-o-projeto)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Tecnologias](#tecnologias)
-- [Funcionalidades](#funcionalidades)
-- [Modo Mock vs Produção](#modo-mock-vs-produção)
-- [Contribuindo](#contribuindo)
+## 🚀 Instalação Local
 
-## ✨ Características
-
-- ✅ **Fase 1**: Fundamentos Estratégicos (Missão, Visão, Valores, SWOT)
-- ✅ **Fase 2**: BSC - Balanced Scorecard
-  - Mapa Estratégico Visual
-  - Objetivos e Perspectivas
-  - Indicadores de Desempenho
-  - Dashboard Executivo
-- ✅ **Fase 3**: Gestão de Projetos (PMO)
-  - Portfólio de Projetos
-  - Métricas EVA (CPI/SPI)
-  - Vinculação com Objetivos Estratégicos
-- ✅ **Gestão Orçamentária**: PPA, LDO, LOA
-- ✅ **Autenticação** e controle de acesso
-- ✅ **Modo offline** com localStorage
-- ✅ **Responsivo** e otimizado para mobile
-
-## 🔧 Pré-requisitos
-
-- **Node.js** >= 18.0.0
-- **npm** ou **yarn**
-- **Conta Supabase** (opcional, possui modo mock para desenvolvimento)
-
-## 📦 Instalação
+### 1. Clone o repositório
 
 ```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/sgem.git
-cd sgem
+git clone https://github.com/narcisolcf/planejagovastudiov1.git
+cd planejagovastudiov1
+```
 
-# Instale as dependências
+### 2. Instale as dependências
+
+```bash
 npm install
+# ou
+yarn install
 ```
 
-## ⚙️ Configuração
+### 3. Configure as variáveis de ambiente
 
-### 1. Variáveis de Ambiente
-
-Copie o arquivo de exemplo:
-
-```bash
-cp .env.example .env.local
-```
-
-Edite `.env.local`:
+Crie um arquivo `.env.local` na raiz do projeto:
 
 ```env
-# Supabase Configuration
-VITE_SUPABASE_URL=https://seu-projeto.supabase.co
-VITE_SUPABASE_ANON_KEY=sua-chave-publica-aqui
+# Gemini API (OBRIGATÓRIO)
+GEMINI_API_KEY=sua_chave_gemini_aqui
+
+# Supabase (OPCIONAL - para persistência de dados)
+NEXT_PUBLIC_SUPABASE_URL=sua_url_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_supabase
+
+# URL da aplicação (desenvolvimento)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-> **Modo Mock**: Se você deixar os valores como `your_supabase_url`, o sistema automaticamente usará o modo MOCK para desenvolvimento local sem necessidade de banco de dados.
+#### Como obter a chave do Gemini:
+1. Acesse https://ai.google.dev/
+2. Clique em "Get API Key"
+3. Crie um novo projeto ou selecione um existente
+4. Copie a chave gerada
 
-### 2. Configurar Supabase (Produção)
-
-#### 2.1 Criar Projeto no Supabase
-
-1. Acesse [supabase.com](https://supabase.com)
-2. Crie um novo projeto
-3. Anote a URL e a Anon Key
-
-#### 2.2 Executar Migrations
-
-No dashboard do Supabase, vá em **SQL Editor** e execute:
-
-```bash
-# Copie o conteúdo de:
-supabase/migrations/001_auth_organizations.sql
-```
-
-Ou use a CLI do Supabase:
-
-```bash
-supabase db push
-```
-
-#### 2.3 Configurar Storage
-
-1. Vá em **Storage** no dashboard
-2. Crie um bucket chamado `documents`
-3. Configure as permissões:
-
-```sql
--- Policy para upload de documentos
-CREATE POLICY "Authenticated users can upload documents"
-ON storage.objects FOR INSERT TO authenticated
-WITH CHECK (bucket_id = 'documents');
-
--- Policy para leitura
-CREATE POLICY "Authenticated users can read documents"
-ON storage.objects FOR SELECT TO authenticated
-USING (bucket_id = 'documents');
-```
-
-## 🚀 Executando o Projeto
-
-### Desenvolvimento
+### 4. Execute o servidor de desenvolvimento
 
 ```bash
 npm run dev
+# ou
+yarn dev
 ```
 
-Acesse: `http://localhost:3000`
+A aplicação estará disponível em: **http://localhost:3000**
 
-**Credenciais padrão (modo mock)**:
-- Email: qualquer email válido
-- Senha: qualquer senha com 6+ caracteres
-
-### Build para Produção
+### 5. Build de produção
 
 ```bash
 npm run build
-npm run preview
+npm start
 ```
+
+## 🌐 Deploy
+
+### Deploy no Vercel (Recomendado)
+
+1. Faça push do código para o GitHub
+2. Acesse [vercel.com](https://vercel.com)
+3. Clique em "Import Project"
+4. Selecione seu repositório
+5. Configure as variáveis de ambiente:
+   - `GEMINI_API_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL` (se usar)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (se usar)
+6. Clique em "Deploy"
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/narcisolcf/planejagovastudiov1)
+
+### Deploy no Netlify
+
+1. Faça push do código para o GitHub
+2. Acesse [netlify.com](https://netlify.com)
+3. Clique em "Add new site" → "Import an existing project"
+4. Selecione seu repositório
+5. Configure:
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+6. Adicione as variáveis de ambiente
+7. Clique em "Deploy site"
 
 ## 📁 Estrutura do Projeto
 
 ```
-sgem/
-├── components/          # Componentes React reutilizáveis
-│   ├── ui/             # Componentes base (Button, Card, Input)
-│   ├── auth/           # Componentes de autenticação
-│   ├── bsc/            # Componentes do BSC
-│   │   ├── dashboard/  # Dashboard BSC
-│   │   ├── indicators/ # Gestão de indicadores
-│   │   └── map/        # Mapa estratégico
-│   └── projects/       # Componentes de projetos
-├── pages/              # Páginas da aplicação
-│   ├── bsc/            # Páginas do módulo BSC
-│   └── projects/       # Páginas de projetos
-├── lib/                # Utilitários e configurações
-│   ├── supabase/       # Cliente Supabase + Mock
-│   └── validation.ts   # Validações (senha, email)
-├── contexts/           # Contextos React (Auth, etc)
-├── hooks/              # Custom hooks
-├── supabase/           # Migrations e configurações
-│   └── migrations/     # SQL migrations
-├── types.ts            # Definições TypeScript
-├── App.tsx             # Componente raiz
-├── index.tsx           # Entry point
-└── index.css           # Estilos globais
+planejagovastudiov1/
+├── app/                    # Diretórios de rotas (Next.js App Router)
+├── components/             # Componentes React reutilizáveis
+├── lib/                    # Utilitários e helpers
+├── public/                 # Arquivos estáticos
+├── styles/                 # Estilos globais
+├── pages/api/             # Rotas da API (se usar Pages Router)
+├── .env.local             # Variáveis de ambiente (não commitar)
+├── next.config.js         # Configuração do Next.js
+├── package.json           # Dependências do projeto
+└── README.md              # Este arquivo
 ```
-
-## 🛠️ Tecnologias
-
-### Core
-- **React 19.2.0** - UI Framework
-- **TypeScript 5.8.2** - Type Safety
-- **Vite 6.2.0** - Build Tool
-- **React Router 7.9.6** - Roteamento
-
-### UI/UX
-- **Tailwind CSS** - Estilização (via CDN)
-- **Lucide React** - Ícones
-- **React Flow 11.10.4** - Mapa Estratégico
-- **Recharts 2.12.2** - Gráficos
-
-### Estado e Dados
-- **TanStack Query 5.90.10** - Cache e sincronização
-- **React Hook Form 7.66.1** - Formulários
-- **Supabase 2.83.0** - Backend (Auth + Database)
-
-### Utilitários
-- **Dagre** - Layout de grafos
-- **Lodash** - Funções utilitárias
-
-## 🎯 Funcionalidades
-
-### Autenticação e Segurança
-- ✅ Login com validação de senha forte
-- ✅ Sessões persistentes
-- ✅ Logout funcional
-- ✅ RLS (Row Level Security) no Supabase
-
-### Gestão Estratégica
-- ✅ Definição de Missão, Visão e Valores
-- ✅ Análise SWOT interativa
-- ✅ 4 Perspectivas do BSC personalizáveis
-- ✅ Mapa Estratégico com relações causa-efeito
-- ✅ Biblioteca de indicadores
-- ✅ Coleta e acompanhamento de medições
-
-### Gestão de Projetos
-- ✅ Dashboard PMO com KPIs
-- ✅ Carteira de projetos filtráv el
-- ✅ Cálculo automático de EVA (CPI/SPI)
-- ✅ Vinculação com objetivos estratégicos
-- ✅ Status de saúde do projeto
-
-### Gestão Orçamentária
-- ✅ Upload de PPA, LDO e LOA (PDFs)
-- ✅ Visualização de ciclo orçamentário
-- ✅ Acompanhamento de execução
-
-## 🔄 Modo Mock vs Produção
-
-### Modo Mock (Desenvolvimento)
-
-O sistema detecta automaticamente quando usar o modo mock:
-
-- Nenhuma configuração Supabase necessária
-- Dados salvos em **localStorage** (persistem entre sessões)
-- Autenticação simulada
-- Ideal para desenvolvimento e testes
-
-**Como ativar**: Deixe as variáveis de ambiente com valores placeholder ou não as configure.
-
-### Modo Produção
-
-Quando configurado com Supabase real:
-
-- Autenticação completa
-- Dados persistidos no PostgreSQL
-- Storage para arquivos
-- Segurança via RLS
-
-## 📊 Dados de Exemplo
-
-O sistema vem com dados mock pré-configurados:
-
-- 4 Perspectivas BSC
-- 4 Objetivos Estratégicos
-- 2 Indicadores
-- 3 Projetos de exemplo
-- Análise SWOT completa
-
-## 🐛 Troubleshooting
-
-### Erro: "Cannot connect to Supabase"
-
-- Verifique se as credenciais em `.env.local` estão corretas
-- Confirme que o projeto Supabase está ativo
-- Em desenvolvimento, use o modo mock
-
-### Erro: "Bucket 'documents' not found"
-
-- Crie o bucket `documents` no Supabase Storage
-- Configure as permissões conforme seção de Configuração
-
-### Dados não persistem
-
-- **Modo Mock**: Verifique se o localStorage não está cheio
-- **Modo Produção**: Verifique as policies RLS no Supabase
 
 ## 🧪 Testes
 
 ```bash
-# Executar testes unitários (se configurado)
+# Executar testes
 npm test
 
-# Executar linter
-npm run lint
+# Executar testes com cobertura
+npm run test:coverage
 ```
 
-## 📝 Scripts Disponíveis
+## 📝 Funcionalidades
 
-```bash
-npm run dev       # Inicia servidor de desenvolvimento
-npm run build     # Build para produção
-npm run preview   # Preview do build
-npm run lint      # Executa ESLint
-npm run format    # Formata código com Prettier
-```
+- ✅ Criação de planos governamentais
+- ✅ Edição e atualização de planos
+- ✅ Exclusão de planos
+- ✅ Listagem e busca de planos
+- ✅ Autenticação de usuários
+- ✅ Interface responsiva
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Next.js 14+** - Framework React
+- **React 18+** - Biblioteca de UI
+- **TypeScript** - Tipagem estática
+- **Tailwind CSS** - Estilização
+- **Supabase** - Banco de dados (opcional)
+- **Google Gemini AI** - Inteligência artificial
 
 ## 🤝 Contribuindo
 
 1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'Add: MinhaFeature'`)
+3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
 4. Push para a branch (`git push origin feature/MinhaFeature`)
 5. Abra um Pull Request
 
@@ -297,20 +149,14 @@ npm run format    # Formata código com Prettier
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## 👥 Autores
+## 📧 Contato
 
-- **Equipe SGEM** - Desenvolvimento inicial
+Para dúvidas ou sugestões, entre em contato através de:
+- Email: contato@planejagovbrasil.com.br
+- Issues: https://github.com/narcisolcf/planejagovastudiov1/issues
 
 ## 🙏 Agradecimentos
 
-- Metodologia BSC adaptada de Kaplan & Norton
-- Comunidade React e TypeScript
-- Supabase pela excelente plataforma
-
----
-
-**Documentação completa**: [Acesse o Wiki](https://github.com/seu-usuario/sgem/wiki)
-
-**Reportar bugs**: [Issues](https://github.com/seu-usuario/sgem/issues)
-
-**Suporte**: [Discussions](https://github.com/seu-usuario/sgem/discussions)
+- Comunidade Next.js
+- Google Gemini AI
+- TestSprite para testes automatizados
