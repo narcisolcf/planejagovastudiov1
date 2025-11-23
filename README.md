@@ -160,3 +160,4 @@ Para dúvidas ou sugestões, entre em contato através de:
 - Comunidade Next.js
 - Google Gemini AI
 - TestSprite para testes automatizados
+Teste de deploy forçado via Web.
