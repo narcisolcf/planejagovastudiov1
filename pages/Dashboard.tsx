@@ -2,15 +2,19 @@ import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase/client';
-import { 
-  ArrowUpRight, Users, Target, ListTodo, 
-  Coins, Scale, FileText, PieChart, Calendar, 
+import { supabaseStorage, type LegalDocumentType } from '../lib/storage';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  ArrowUpRight, Users, Target, ListTodo,
+  Coins, Scale, FileText, PieChart, Calendar,
   TrendingUp, AlertCircle, CheckCircle2, Upload, FileCheck
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'budget'>('budget');
   const [uploadingType, setUploadingType] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activeUploadTypeRef = useRef<string | null>(null);
 
@@ -37,7 +41,7 @@ export const DashboardPage: React.FC = () => {
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    const type = activeUploadTypeRef.current;
+    const type = activeUploadTypeRef.current as LegalDocumentType | null;
 
     if (!file || !type) return;
 
@@ -48,30 +52,51 @@ export const DashboardPage: React.FC = () => {
 
     try {
       setUploadingType(type);
+      setUploadSuccess(null);
 
-      // Nome do arquivo: TIPO_TIMESTAMP.pdf
-      const fileName = `${type}_${Date.now()}.pdf`;
-      const filePath = `docs_legais/${fileName}`;
+      // 1. Upload para Supabase Storage usando a camada de abstração
+      const { path, url, size } = await supabaseStorage.uploadLegalDocument(type, file);
 
-      // Upload para o Supabase Storage
-      // Bucket esperado: 'documents' (precisa ser criado no dashboard do Supabase)
-      const { data, error } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file);
+      // 2. Salvar referência no banco de dados
+      const { data: documentData, error: dbError } = await supabase
+        .from('legal_documents')
+        .insert({
+          type: type,
+          file_path: path,
+          file_url: url,
+          file_size: size,
+          year: 2025, // TODO: Extrair do arquivo ou permitir seleção
+          status: 'pending',
+          uploaded_by: user?.id
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (dbError) {
+        console.error('Erro ao salvar no banco:', dbError);
+        // Se falhou ao salvar no banco, tenta deletar o arquivo do storage
+        await supabaseStorage.deleteFile('documents', path);
+        throw dbError;
+      }
 
-      alert(`Arquivo da ${type} enviado com sucesso!`);
-      // Aqui você salvaria a referência (URL) no banco de dados na tabela correspondente
-      
+      setUploadSuccess(`${type} enviado com sucesso!`);
+
+      // 3. (OPCIONAL) Trigger processamento com Document AI
+      // Isso seria feito em uma Cloud Function para não bloquear a UI
+      // await fetch('/api/gcp/process-document', {
+      //   method: 'POST',
+      //   body: JSON.stringify({ documentId: documentData.id, fileUrl: url, type })
+      // });
+
+      // Auto-hide success message após 5 segundos
+      setTimeout(() => setUploadSuccess(null), 5000);
+
     } catch (error: any) {
       console.error('Erro no upload:', error);
-      // Fallback amigável para erro caso o bucket não exista ou erro de permissão
-      const msg = error.message || 'Falha ao enviar arquivo. Verifique as permissões ou se o bucket "documents" existe.';
-      alert(msg);
+      const msg = error.message || 'Falha ao enviar arquivo. Verifique as permissões.';
+      alert(`Erro: ${msg}`);
     } finally {
       setUploadingType(null);
-      // Limpa o input para permitir selecionar o mesmo arquivo novamente se necessário
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -79,13 +104,24 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Input Hidden para Upload */}
-      <input 
-        type="file" 
+      <input
+        type="file"
         ref={fileInputRef}
-        className="hidden" 
-        accept=".pdf" 
+        className="hidden"
+        accept=".pdf"
         onChange={handleFileChange}
       />
+
+      {/* Success Alert */}
+      {uploadSuccess && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+          <CheckCircle2 className="text-emerald-600 mt-0.5" size={20} />
+          <div className="flex-1">
+            <h4 className="text-sm font-bold text-emerald-800">Upload Concluído</h4>
+            <p className="text-xs text-emerald-700 mt-1">{uploadSuccess}</p>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
