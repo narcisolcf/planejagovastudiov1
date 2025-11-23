@@ -1,20 +1,20 @@
-
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './pages/Dashboard';
-import { StrategicFundamentalsPage } from './pages/StrategicFundamentals';
+import { StrategicFundamentalsPage } from '../pages/StrategicFundamentals';
 import { BudgetAnalysisPage } from './pages/BudgetAnalysis';
-import { StrategicMapPage } from './pages/bsc/StrategicMapPage';
+import { StrategicMapPage } from '../pages/bsc/StrategicMapPage';
 import { ObjectivesPage } from './pages/bsc/ObjectivesPage';
-import { IndicatorsPage } from './pages/bsc/IndicatorsPage';
-import { BSCDashboardPage } from './pages/bsc/BSCDashboardPage';
-import { ProjectsDashboardPage } from './pages/projects/ProjectsDashboardPage';
+import { IndicatorsPage } from '../pages/bsc/IndicatorsPage';
+import { BSCDashboardPage } from '../pages/bsc/BSCDashboardPage';
+import { ProjectsDashboardPage } from '../pages/projects/ProjectsDashboardPage';
 import { ProjectsListPage } from './pages/projects/ProjectsListPage';
 import { ProjectDetailPage } from './pages/projects/ProjectDetailPage';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LoginForm } from './components/auth/LoginForm';
+import { NotFoundPage } from './pages/NotFound';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { LoginForm } from '../components/auth/LoginForm';
 import { Target, FileBarChart, List, LayoutDashboard, Briefcase, ListTodo } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -32,7 +32,7 @@ const queryClient = new QueryClient({
 // Layout auxiliar para sub-rotas do BSC
 const BSCLayout = () => {
   const location = useLocation();
-  
+
   const tabs = [
     { name: 'Painel Executivo', href: '/bsc/dashboard', icon: LayoutDashboard },
     { name: 'Mapa Estratégico', href: '/bsc/mapa', icon: Target },
@@ -46,14 +46,14 @@ const BSCLayout = () => {
         <h1 className="text-2xl font-bold text-slate-900">Balanced Scorecard (BSC)</h1>
         <p className="text-slate-500 mt-1">Fase 2: Gestão Estratégica e Indicadores de Desempenho</p>
       </div>
-      
+
       <div className="border-b border-slate-200">
         <nav className="-mb-px flex space-x-8 overflow-x-auto">
           {tabs.map(tab => {
-            const isActive = tab.href === '/bsc/dashboard' 
+            const isActive = tab.href === '/bsc/dashboard'
               ? location.pathname === '/bsc/dashboard'
               : location.pathname.startsWith(tab.href);
-            
+
             const Icon = tab.icon;
             return (
               <Link
@@ -61,8 +61,8 @@ const BSCLayout = () => {
                 to={tab.href}
                 className={`
                   whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors duration-200
-                  ${isActive 
-                    ? 'border-blue-600 text-blue-600' 
+                  ${isActive
+                    ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}
                 `}
               >
@@ -73,7 +73,7 @@ const BSCLayout = () => {
           })}
         </nav>
       </div>
-      
+
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         <Outlet />
       </div>
@@ -84,7 +84,7 @@ const BSCLayout = () => {
 // Layout auxiliar para Projetos
 const ProjectsLayout = () => {
   const location = useLocation();
-  
+
   const tabs = [
     { name: 'Visão Geral (PMO)', href: '/projetos/dashboard', icon: LayoutDashboard },
     { name: 'Carteira de Projetos', href: '/projetos/lista', icon: ListTodo },
@@ -105,8 +105,8 @@ const ProjectsLayout = () => {
                 to={tab.href}
                 className={`
                   whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors duration-200
-                  ${isActive 
-                    ? 'border-blue-600 text-blue-600' 
+                  ${isActive
+                    ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}
                 `}
               >
@@ -148,7 +148,7 @@ const LoginRoute = () => {
   const { session, loading } = useAuth();
 
   if (loading) return null;
-  
+
   if (session) {
     return <Navigate to="/" replace />;
   }
@@ -167,59 +167,65 @@ const LoginRoute = () => {
   );
 };
 
+export const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginRoute />} />
+
+      <Route path="/" element={
+        <ProtectedRoute>
+          <DashboardPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/fundamentos" element={
+        <ProtectedRoute>
+          <StrategicFundamentalsPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/analise" element={
+        <ProtectedRoute>
+          <BudgetAnalysisPage />
+        </ProtectedRoute>
+      } />
+
+      {/* BSC Routes */}
+      <Route path="/bsc" element={
+        <ProtectedRoute>
+          <BSCLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<BSCDashboardPage />} />
+        <Route path="mapa" element={<StrategicMapPage />} />
+        <Route path="objetivos" element={<ObjectivesPage />} />
+        <Route path="indicadores" element={<IndicatorsPage />} />
+      </Route>
+
+      {/* Projects Routes (Phase 3) */}
+      <Route path="/projetos" element={
+        <ProtectedRoute>
+          <ProjectsLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<ProjectsDashboardPage />} />
+        <Route path="lista" element={<ProjectsListPage />} />
+        <Route path="lista/:id" element={<ProjectDetailPage />} />
+      </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <Routes>
-            <Route path="/login" element={<LoginRoute />} />
-            
-            <Route path="/" element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/fundamentos" element={
-              <ProtectedRoute>
-                <StrategicFundamentalsPage />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/analise" element={
-              <ProtectedRoute>
-                <BudgetAnalysisPage />
-              </ProtectedRoute>
-            } />
-            
-            {/* BSC Routes */}
-            <Route path="/bsc" element={
-              <ProtectedRoute>
-                <BSCLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<BSCDashboardPage />} />
-              <Route path="mapa" element={<StrategicMapPage />} />
-              <Route path="objetivos" element={<ObjectivesPage />} />
-              <Route path="indicadores" element={<IndicatorsPage />} />
-            </Route>
-            
-            {/* Projects Routes (Phase 3) */}
-            <Route path="/projetos" element={
-              <ProtectedRoute>
-                <ProjectsLayout />
-              </ProtectedRoute>
-            }>
-               <Route index element={<Navigate to="dashboard" replace />} />
-               <Route path="dashboard" element={<ProjectsDashboardPage />} />
-               <Route path="lista" element={<ProjectsListPage />} />
-               <Route path="lista/:id" element={<ProjectDetailPage />} />
-            </Route>
-            
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <AppRoutes />
         </Router>
       </AuthProvider>
     </QueryClientProvider>
